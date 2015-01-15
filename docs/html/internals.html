@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>shfs: How it works</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="shfsv4.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+@import url("shfs.css");
+-->
+</style>
+</head>
+<body>
+
+<!-- header -->
+<div id="header">
+<h1>shfs: (Secure) SHell FileSystem Linux kernel module</h1>
+<p><em>&quot;Mount ANY dir from ANY host in a SECURE way&quot;</em></p>
+</div>
+
+<!-- header -->
+<div id="main">
+
+<!-- content -->
+<div id="content">
+
+<!-- sidebar -->
+<div id="sidebar">
+<!-- linkbar -->
+<div id="linkbar">
+<h2>shfs links</h2>
+<p><a href="index.html">About</a></p>
+<p><a href="faq.html">FAQ</a></p>
+<p><a href="http://sourceforge.net/project/showfiles.php?group_id=72997&amp;package_id=93905">Download</a></p>
+<p><a href="install.html">Installation guide</a></p>
+<p><a href="http://sourceforge.net/mail/?group_id=72997">Mailing lists</a></p>
+<p><a href="http://atrey.karlin.mff.cuni.cz/~qiq/src/shfs/">Patches</a></p>
+<p><a href="internals.html">How it works</a></p>
+<p><a href="http://sourceforge.net/projects/shfs/">SourceForge.net</a></p>
+</div>
+</div>
+
+<h1>How it works</h1>
+
+<p>Here you can make overview about how shfs works.</p>
+
+<h2>The source tree</h2>
+
+<p>Shfs sources are split across few directories. The <tt>shfs/Linux-2.x</tt>
+directory contains kernel module code for the specified kernel version, while shfsmount/ directory
+is where user-space utilities live (shfsmount, the perl/shell server core is here too).</p>
+
+<h2>Where the code came from</h2>
+
+<p>Since writing new filesystem module from the scratch is not very funny thing, shfs
+was partially based on Florin Malita's <a href="http://ftpfs.sourceforge.net/">ftpfs</a>.
+with some bugs fixed (locking, memory leaks, handling of date). As the time flows, the code
+from ftpfs began to vanish and now there is hardly any there. I have assimilated some portions
+of smbfs(ncpfs) code (mainly directory caching code through page cache) from the main Linux
+kernel tree.
+
+<h2>Caches</h2>
+
+<p>Sending shell command to the remote host on every request from the kernel VFS layer
+is not a wise idea, because of high load it generates on both sides of ssh channel.
+Much better way is to use the caches for some operations, such as reading directories,
+reading and writing files, etc.
+
+<h3>Read-write cache</h3>
+(<a href="../../shfs/Linux-2.6/fcache.c">fcache.c</a>)
+<ul>
+<li>on file open, n pages are allocated as simple read-write buffer
+<li>file-offset and size are associated with the buffer
+<li>entire buffer is either clean (for read only) or dirty (data not yet written)
+<li>on read request, an attempt to read full buffer is performed (dirty data are flushed)
+<li>subsequent requests read data from this buffer (hit)
+<li>on write request, if there is enough space in the buffer, data are written to the buffer
+<li>if buffer is full or file is closed, the entire buffer is is send to the remote peer
+</ul>
+
+<p>This makes great performance improvement, since calling <tt>dd</tt> (= storing
+data on the remote side) for each page generate quite high system load.
+Using read-write cache, <tt>dd</tt> is only called every on nth request.
+You can switch this cache off using "nocache" option while mounting the filesystem.
+
+<h3>Directory cache</h3>
+(<a href="../../shfs/Linux-2.6/dcache.c">dcache.c</a>)
+<ul>
+<li>this cache is taken almost intact from smbfs/ncpfs, it uses plain dentry cache and
+page cache to prevent rm -rf from complaining
+<li>the time-to-live of the dentry is 30 seconds by default, could be changed in
+the mount-time (ttl option).
+</ul>
+
+<h3>Readline cache</h3>
+(<a href="../../shfs/Linux-2.6/proc.c">proc.c</a>, function <tt>sock_readln</tt>)
+<p>Lines are read all at once instead of char-by-char. This speeds up directory lookup.</p>
+
+<h2>How it all works together</h2>
+
+<p><a href="images/schema.png">Figure</a> illustrates: When user calls shfsmount (or mount -t shfs) command in
+order to mount remote share, basic checks are done, process is forked and user
+command (ssh in most cases) is executed. This command has stdin/stdout
+redirected so it can be used for the connection by shfsmount. After connection is established,
+shfsmount initializes remote side and transfers &quot;server&quot; code to the remote side.</p>
+
+<p>Although shfs is <strong>sh</strong>ell <strong>f</strong>ile<strong>s</strong>ystem,
+there are two different server code available: shell and perl. Both
+have the same basic functionality although perl code is faster and more robust.
+Every code type has its <em>test</em> phase which does all necessary checks (for
+perl this would be perl version, available modules, etc.).</p>
+
+<p>Then, shfsmount calls mount syscall and passes the file descriptor (of ssh stdin/stdout) to the kernel
+module. Shfsmount could exit or wait for ssh to die and restart the connection again (while in persistent mode).</p>
+
+</div>
+</div>
+
+<!-- footer -->
+<div id="footer">
+<p>
+--<br>
+<p><a href="mailto:qiq@ucw.cz">&lt;qiq@ucw.cz&gt;</a></p>
+</div>
+
+</body>
+</html>

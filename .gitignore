@@ -1,0 +1,16 @@
+.directory
+*~
+.tmp_versions
+*.cmd
+Module.symvers
+modules.order
+*.mod.c
+*.mod.o
+
+# Object files
+*.[aod]
+*.ko
+
+shfsmount
+shfsumount
+

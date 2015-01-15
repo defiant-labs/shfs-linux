@@ -1,0 +1,79 @@
+body {
+	background-color: #EEEEEE;
+	margin: 36px 36px 0 240px;
+	padding: 0;
+}
+h1 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 18px;
+}
+h2 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+}
+h3 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+/* Netscape 4 will not honor font styles on the body selector very well */
+p, div {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#header {
+	margin: 0;
+}
+#header h1 {
+	font-size: 18px;
+}
+#header p {
+	padding: 0 0 0 20px;
+	font-size: 12px;
+}
+
+#content p, #content ul, #content ol, #content pre {
+	font-size: 14px;
+}
+#content h1 {
+	margin: 0 0 12px 0;
+}
+
+#main {
+	margin: 0;
+}
+
+/* Sidebar is absolutely posititioned for NN4 because it's more stable than floating */
+#sidebar {
+	position: absolute;
+	left: 24px;
+	width: 180px;
+	top: 136px;
+	color: #666666;
+}
+#linkbar h2 {
+	margin: 0 0 12px 0;
+}
+#linkbar p {
+	font-size: 12px;
+	color: #666666;
+}
+#logo p {
+	font-size: 12px;
+}
+#footer {
+	margin: 48px 0 0 0;
+}
+#footer p {
+	margin: 0;
+	font-size: 10px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+#linkbar a:link, #linkbar a:visited {
+	color: #000;
+}
+
+/* Hover is used because MSIE4 supports it */
+#linkbar a:hover, #linkbar a:active {
+	color: #999;
+}

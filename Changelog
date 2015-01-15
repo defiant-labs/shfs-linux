@@ -1,0 +1,176 @@
+shfs (0.35) unstable; urgency=low
+
+  * fixed MAN_PAGE_DIR (thanks to Janus N. Tondering)
+  * shfsumount added to shfs-utils.spec file (reported by 
+    Richard Lucassen & waldeck at abacho de)
+  * build process improvements (make dist includes html pages now)
+  * group write access is sufficient to mount dir as ordinary user
+  * fsync() should not return -EINVAL
+  * ls shows incorrect sizes for file bigger than 2GB (thanks to Christoph
+    camikusch at web de)
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Wed, 24 Mar 2004 16:42:46 +0100
+
+shfs (0.34) unstable; urgency=low
+
+  * manpage is installed by default (suggested by Ladislav Hagara
+    hgr at vabo.cz)
+  * faq updated
+  * handling of ' fixed (reported by richard lucassen spamtrap at
+    lucassen.org)
+  * du command show incorrent sizes
+  * perl version 5.00x should be correctly recognised
+  * statfs should work on most systems (df -k -P => df -k)
+  * shfsumount added again (makes possible user umounts)
+  * shfsmount -o stable option fixed
+  * copy read-only files fixed
+  * kernel version is now part of the module package name
+  * fcache size made configurable
+  * max. number of cached files is configurable
+  * MacOS X fixes: ls resturns 0 on file-not-found
+                   ls -l month & day columns are swapped
+  * lockup fix on ssh exit fixed
+  * test -e warning on SunOS fixed
+  * test for perl modules fixed
+  * nomtab (-n) option added (by Marc Welz)
+  * stderr is /dev/tty now
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Fri, 28 May 2004 12:06:28 +0200
+
+shfs (0.33) unstable; urgency=low
+
+  * huge portions rewritten, smbfs/ncpfs dir cache code assimilated
+  * "server" code moved to userspace
+  * user option added for shfsmount, shfsumount removed (thanks
+    to Markus Kuhn, mkuhn at users.sourceforge.net).
+  * remote OS detection removed (great tips/patches from Csaba Henk, 
+    ekho at renyi.hu)
+  * shell code fixes
+  * perl server support added
+  * persistent option added
+  * preserve works r/w (perl server)
+  * any command is supported for connection (--cmd option)
+  * shfsmount options added (automounter support)
+  * debug support changed (can be turned on at mount time: -v option)
+  * file cache memory leak hopefully fixed
+  * SMP fixes
+  * emacs should be working now (time sync troubles workarounded)
+  * docs update
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Sat, 20 Mar 2004 17:50:43 +0100
+
+shfs (0.32) unstable; urgency=low
+
+  * uid & gid mount options should work corrctly now
+  * do not close stderr for ssh (sshv1 should work now)
+  * docbase path fixed for debian package 
+    (thanks to Christian Schrader, Christian.Schrader at gmx.de)
+  
+ -- Miroslav Spousta <qiq@ucw.cz>  Tue,  4 Nov 2003 10:53:43 +0100
+
+shfs (0.32pre2) unstable; urgency=low
+
+  * dentry caching rewritten, dcache.c does not use hash table.
+  * Oops fixed (thanks to Antoine Labour, antoine.labour at m4x.org).
+  * hash tables removed from the file cache.
+  * Directory order fixed (fix from Dylan Hall, dylan.hall at tsnz.net).
+  * SIGPIPE fixed on dir open when connection is dead (thanks to
+    Michael Bartlett, michael.bartlett at workshare.com)
+  * SIGINT is postponed while in reading remote data.
+  * ttl option added for shfsmount
+  * Cygwin support added
+  * statfs implemented (df shows remote share)
+  * stable (autoresolve) symlinks option added
+  * mount<->module API version introduced
+  * full disk behaviour corrected
+  * AMD automounter support removed.
+  * autofs automounter freeze fix (thanks to Wataru Fujishige,
+    wataru at fujishige.net)
+  * module sources split between 2.4 and 2.6 version
+  * kernel patch make option added.
+  * docs update.
+  * settime implemented.
+  * "preserve" implies "ro" mount attribute.
+  * close() return value fixed.
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Sat,  6 Sep 2003 12:46:07 +0200
+
+shfs (0.32pre1) unstable; urgency=low
+
+  * speed improvement: use socket instead of pair of pipes
+  * rpm depmod call fixed (thanks to Nathaniel Gray, n8gray at caltech.edu)
+  * Install ln -fs fix (thanks to Brett Kuskie, mstrprgmmr at chek.com)
+  * DEBUG variable fixes
+  * 32bit uid/gid fix
+  * rpm build fix
+  * compiler warning fixed
+  * docs typos fixed (thanks to Makis Marmaridis, makis at marmaridis.org)
+  * rpm build fix (thanks to Richard Lucassen, spamtrap at lucassen.org)
+  * inode attributes fix
+  * does not use release numbers
+  * build fixes (does not require root)
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Tue, 10 Jun 2003 10:03:00 +0200
+
+shfs (0.31-1) unstable; urgency=low
+
+  * top Makefile DEBUG variable added
+  * user mounts fully supported (thanks to Grzegorz Jasko)
+  * shfsumount command added
+  * suid, nosuid, dev, nodev, exec, noexec mount options added
+  * doc updates
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Sat, 10 May 2003 9:23:08 +0200
+
+shfs (0.30-1) unstable; urgency=low
+
+  * linux 2.4.19+ stale NFS handle fix
+  * OSF1 support added (thanks to stanimir at rdscv.ro)
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Tue,  6 May 2003 15:09:08 +0200
+
+shfs (0.29-2) unstable; urgency=low
+
+  * rc 2
+  * IRIX64 symlink fix
+  * create () should respect given access mode now
+  * shell protocol fixes
+  * gcc 3.x compilation fixes
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Fri, 31 Jan 2003 10:16:00 +0100
+
+shfs (0.29-1) unstable; urgency=low
+
+  * release candidate 1 :-)
+  * shell protocol rewritten to use shell functions
+  * removed dentry ops -> nasty invalid symlink bug (Oops) fixed
+  * write does not invalidate parent dir cache entry
+  * dcache validity improvements
+  * no more kmem alloc for dir entries -> (SLAB) name_cache
+  * docs update
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Sun, 26 Jan 2003 20:06:51 +0100
+
+shfs (0.28) unstable; urgency=low
+
+  * Makefiles cleanup & rewrite
+  * shfsmount rewritten, options changed and added
+  * debian package support
+  * rpm package support
+  * readahead cache speedup for small files
+  * "write to full disk" error detection and recovery
+  * file append fix (file_commitwrite())
+  * clean garbage fix
+  * remote timezone fix
+  * invalid dd usage (locale) in read fixed
+  * directory traversal fix (no more "find: changed during execution")
+  * create symlink fix
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Thu,  1 Aug 2002 10:15:11 +0200
+
+shfs (0.27) unstable; urgency=low
+
+  * Version 0.27 released (first public)
+
+ -- Miroslav Spousta <qiq@ucw.cz>  Sat,  8 Jun 2002 08:00:00 +0200
+

@@ -1,0 +1,177 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.8
+.TH SHFSMOUNT 8 "2004 Mar 17" "shfsmount" "SHFS Manual"
+.SH NAME
+shfsmount \- mount remote volumes using (secure) shell connection.
+.SH SYNOPSIS
+.B shfsmount
+.RB [ options ]
+.RB [ [ user@ ]hostname[ :root ] ]
+.RB mount_point
+.sp
+.B shfsmount
+.RB [ \-hV ]
+.sp
+.SH DESCRIPTION
+The
+.B shfsmount
+is a mount-support utility which makes possible to mount remote volumes to the 
+local file system tree through simple shell connection. 
+It uses ssh (or any other program) connection to remote servers. It requires
+.B shfs.o
+kernel module to be loaded. If you set suid bit on 
+.B shfsmount
+you enable ANY USER to mount remote dirs. User must be owner
+(or member of group) of mount_point and must have write access
+for that directory.
+.LP
+.SH OPTIONS
+.TP
+.B \-u, \-\-cmd\-user=user
+execute command (ssh) as this user (root only)
+.TP
+.B \-c, \-\-cmd=COMMAND
+command to connect to remote side (see below)
+.TP
+.B \-P, \-\-port=PORT
+connect to this port
+.TP
+.B \-p, \-\-persistent
+make connection persistent (broken connection is re-established)
+.TP
+.B \-t, \-\-type=TYPE
+connection server type (currently only "perl" and "shell" are supported)
+.TP
+.B \-s, \-\-stable
+dereference symbolic links (if possible)
+.TP
+.B \-o, \-\-options
+mount options (see below)
+.TP
+.B \-v, \-\-verbose
+print debug messages; more options increases verbosity; this affects
+kernel module too
+.TP
+.B \-V, \-\-version
+print version number
+.TP
+.B \-h, \-\-help
+print usage information
+.TP
+.B user
+log in using this user name
+.TP
+.B hostname
+specify remote host
+.TP
+.B root
+remote directory to become root of the new mounted tree
+.SH "MOUNT OPTIONS"
+.TP
+.B cachesize=N
+set read-ahead and write-back cache size in pages, page size 
+is 4KB on i386, 0 = disable filecache (default is 32, i.e. 128KB)
+.TP
+.B cachemax=N
+set maximum number of files cached at once (default is 10)
+.TP
+.B preserve
+preserve uid/gid (root only)
+.TP
+.B ttl=TIME
+time to live (sec) of cached directory entries
+.TP
+.B uid=USER
+owner of all files/dirs on mounted file system (root only)
+.TP
+.B gid=GROUP
+group of all files/dirs on mounted file system (root only)
+.TP
+.B rmode=mode
+root dir mode (default is 700)
+.TP
+.B suid, dev
+see
+.BR mount (8) 
+(root only).
+.TP
+.B ro, rw, nosuid, nodev, exec, noexec, user, users
+see
+.BR mount (8).
+.TP
+.B cmd-user, cmd, port, persistent, type, stable
+see above
+.sp
+.RE
+Options in mount_options list are separated by comma without spaces between 
+items (just like in
+.BR mount (8)).
+.sp
+.RE
+.B %u %h %P
+in COMMAND are substituted by user, host and port respectively.
+.IP
+.SH ERRORS
+Mount errors will be written through
+.BR syslog "(3)."
+Stderr is redirected to /dev/null unless 
+.B \-v 
+option is given (may be useful if you cannot connect to remote side).
+On success, 0 is returned.
+.SH "CONFORMING TO"
+Nothing. 
+.SH BUGS
+.sp 2
+Date of remote file/dir may not be shown correctly (+- 1 day).
+"stable" symlinks option may not work on OSF1.
+.sp 1
+Please report bugs [with diff -u patches, of course ;-)] to 
+.I <qiq@ucw.cz>
+.SH "EXAMPLES"
+The simplest version (mount home dir of user at host):
+.IP
+	shfsmount user@host /mnt/shfs
+.PP
+To specify remote directory:
+.IP
+	shfsmount user@host:/tmp /mnt/shfs
+.PP
+To specify another port:
+.IP
+	shfsmount -P 2222 user@host /mnt/shfs
+.PP
+To specify another ssh option:
+.IP
+	shfsmount --cmd="ssh -c blowfish %u@%h /bin/bash" user@host:/tmp /mnt/shfs/
+.PP
+To make mount survive temporary connection outage (reconnect mode):
+.IP
+	shfsmount --persistent user@host /mnt/shfs
+.PP
+Longer transfers? Increase cache size (here 1MB cache per file (256*4KB)):
+.IP
+	shfsmount user@host /mnt/shfs -o cachesize=256
+.PP
+To enable symlink resolution:
+.IP
+	shfsmount -s user@host /mnt/shfs
+.PP
+To preserve uid (gid) (NFS replace mode :-)):
+.IP
+	shfsmount root@host /mnt/shfs -o preserve,rmode=755
+.PP
+To see what is wrong (forces kernel debug output too):
+.IP
+	shfsmount -vvv user@host /mnt/shfs
+.PP
+.SH "SEE ALSO"
+.BR shfsumount (8)\
+,
+.BR mount (8)\
+,
+.BR ssh (1)
+.SH "AUTHOR"
+.nf
+Zemljanka core team (Johanka, Dan, Qiq)
+.I Miroslav Spousta <qiq@ucw.cz>
+.fi

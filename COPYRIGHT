@@ -1,0 +1,6 @@
+SHFS Linux kernel module
+Copyright 2002-2004 Miroslav Spousta <qiq@ucw.cz>
+Partialy based on smbfs/ncpfs, see Linux kernel sources.
+Originaly inspired by ftpfs, Copyright 2001, Florin Malita <fmalita@yahoo.com>
+
+For install instructions/docs see docs/html/index.html

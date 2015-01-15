@@ -1,0 +1,191 @@
+diff -urN linux-2.6.4.orig/fs/Kconfig linux-2.6.4/fs/Kconfig
+--- linux-2.6.4.orig/fs/Kconfig	2004-03-20 14:12:32.000000000 +0100
++++ linux-2.6.4/fs/Kconfig	2004-03-20 14:12:32.000000000 +0100
+@@ -1609,6 +1609,23 @@
+ 
+ 	  If unsure, say N.
+ 
++config SH_FS
++	tristate "SSH File System support (SHFS) (Experimental)"
++	depends on INET && EXPERIMENTAL
++	help
++	  SHFS is a simple and easy to use Linux kernel module which
++	  allows you to mount remote filesystems using plain shell (ssh/rsh)
++	  connection. It supports some nice features like number of different
++	  caches for access speedup, target system optimisations, etc.
++	  
++	  Further information on mounting ssh shares and the options
++	  available can be found at http://shfs.sourceforge.net.
++	  
++	  If you want to compile the SSH support as a module ( = code which
++	  can be inserted in and removed from the running kernel whenever you
++	  want), say M here and read Documentation/modules.txt. The module
++	  will be called shfs.o. Most people say N, however.
++
+ config RXRPC
+ 	tristate
+ 
+diff -urN linux-2.6.4.orig/fs/Makefile linux-2.6.4/fs/Makefile
+--- linux-2.6.4.orig/fs/Makefile	2004-03-20 14:12:32.000000000 +0100
++++ linux-2.6.4/fs/Makefile	2004-03-20 14:12:32.000000000 +0100
+@@ -92,3 +92,4 @@
+ obj-$(CONFIG_XFS_FS)		+= xfs/
+ obj-$(CONFIG_AFS_FS)		+= afs/
+ obj-$(CONFIG_BEFS_FS)		+= befs/
++obj-$(CONFIG_SH_FS)		+= shfs/
+diff -urN linux-2.6.4.orig/fs/shfs/dcache.c linux-2.6.4/fs/shfs/dcache.c
+--- linux-2.6.4.orig/fs/shfs/dcache.c	2004-03-20 12:29:18.000000000 +0100
++++ linux-2.6.4/fs/shfs/dcache.c	2004-03-20 14:12:32.000000000 +0100
+@@ -21,8 +21,8 @@
+ #include <linux/pagemap.h>
+ #include <asm/page.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
+ #include "shfs_debug.h"
+ 
+ /*
+diff -urN linux-2.6.4.orig/fs/shfs/dir.c linux-2.6.4/fs/shfs/dir.c
+--- linux-2.6.4.orig/fs/shfs/dir.c	2004-03-20 12:29:23.000000000 +0100
++++ linux-2.6.4/fs/shfs/dir.c	2004-03-20 14:12:32.000000000 +0100
+@@ -13,7 +13,7 @@
+ #include <asm/uaccess.h>
+ #include <linux/smp_lock.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_i.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_i.h>
+ #include "shfs_debug.h"
+ #include "proc.h"
+ 
+diff -urN linux-2.6.4.orig/fs/shfs/fcache.c linux-2.6.4/fs/shfs/fcache.c
+--- linux-2.6.4.orig/fs/shfs/fcache.c	2004-03-20 13:52:24.000000000 +0100
++++ linux-2.6.4/fs/shfs/fcache.c	2004-03-20 14:12:32.000000000 +0100
+@@ -13,9 +13,9 @@
+ #include <linux/module.h>
+ #include <linux/vmalloc.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
+-#include "shfs_fs_i.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
++#include <linux/shfs_fs_i.h>
+ #include "shfs_debug.h"
+ 
+ #define SHFS_FCACHE_HASH	10
+diff -urN linux-2.6.4.orig/fs/shfs/file.c linux-2.6.4/fs/shfs/file.c
+--- linux-2.6.4.orig/fs/shfs/file.c	2004-03-20 12:29:37.000000000 +0100
++++ linux-2.6.4/fs/shfs/file.c	2004-03-20 14:12:32.000000000 +0100
+@@ -9,9 +9,9 @@
+ #include <asm/fcntl.h>
+ #include <linux/smp_lock.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
+-#include "shfs_fs_i.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
++#include <linux/shfs_fs_i.h>
+ #include "shfs_debug.h"
+ #include "proc.h"
+ 
+diff -urN linux-2.6.4.orig/fs/shfs/inode.c linux-2.6.4/fs/shfs/inode.c
+--- linux-2.6.4.orig/fs/shfs/inode.c	2004-03-20 12:29:43.000000000 +0100
++++ linux-2.6.4/fs/shfs/inode.c	2004-03-20 14:12:32.000000000 +0100
+@@ -15,9 +15,9 @@
+ #include <linux/file.h>
+ #include <linux/smp_lock.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
+-#include "shfs_fs_i.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
++#include <linux/shfs_fs_i.h>
+ #include "shfs_debug.h"
+ #include "proc.h"
+ 
+diff -urN linux-2.6.4.orig/fs/shfs/ioctl.c linux-2.6.4/fs/shfs/ioctl.c
+--- linux-2.6.4.orig/fs/shfs/ioctl.c	2004-03-20 12:29:51.000000000 +0100
++++ linux-2.6.4/fs/shfs/ioctl.c	2004-03-20 14:12:32.000000000 +0100
+@@ -18,8 +18,8 @@
+ #include <linux/errno.h>
+ #include <linux/ioctl.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
+ #include "shfs_debug.h"
+ 
+ int
+diff -urN linux-2.6.4.orig/fs/shfs/proc.c linux-2.6.4/fs/shfs/proc.c
+--- linux-2.6.4.orig/fs/shfs/proc.c	2004-03-20 12:29:58.000000000 +0100
++++ linux-2.6.4/fs/shfs/proc.c	2004-03-20 14:12:32.000000000 +0100
+@@ -23,8 +23,8 @@
+ #include <linux/sched.h>
+ #include <linux/init_task.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
+ #include "shfs_debug.h"
+ #include "proc.h"
+ 
+diff -urN linux-2.6.4.orig/fs/shfs/proc.h linux-2.6.4/fs/shfs/proc.h
+--- linux-2.6.4.orig/fs/shfs/proc.h	2004-03-18 13:33:28.000000000 +0100
++++ linux-2.6.4/fs/shfs/proc.h	2004-03-20 14:12:32.000000000 +0100
+@@ -1,7 +1,7 @@
+ #ifndef _PROC_H
+ #define _PROC_H
+ 
+-#include "shfs_fs_sb.h"
++#include <linux/shfs_fs_sb.h>
+ 
+ static inline int
+ sock_lock(struct shfs_sb_info *info)
+diff -urN linux-2.6.4.orig/fs/shfs/shell.c linux-2.6.4/fs/shfs/shell.c
+--- linux-2.6.4.orig/fs/shfs/shell.c	2004-03-20 12:30:04.000000000 +0100
++++ linux-2.6.4/fs/shfs/shell.c	2004-03-20 14:12:32.000000000 +0100
+@@ -21,8 +21,8 @@
+ #include <linux/uio.h>
+ #include <net/sock.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
+ #include "shfs_debug.h"
+ #include "proc.h"
+ 
+diff -urN linux-2.6.4.orig/fs/shfs/symlink.c linux-2.6.4/fs/shfs/symlink.c
+--- linux-2.6.4.orig/fs/shfs/symlink.c	2004-03-20 12:30:13.000000000 +0100
++++ linux-2.6.4/fs/shfs/symlink.c	2004-03-20 14:12:32.000000000 +0100
+@@ -13,8 +13,8 @@
+ #include <asm/uaccess.h>
+ #include <linux/smp_lock.h>
+ 
+-#include "shfs_fs.h"
+-#include "shfs_fs_sb.h"
++#include <linux/shfs_fs.h>
++#include <linux/shfs_fs_sb.h>
+ #include "shfs_debug.h"
+ #include "proc.h"
+ 
+diff -urN linux-2.6.4.orig/include/linux/shfs_fs.h linux-2.6.4/include/linux/shfs_fs.h
+--- linux-2.6.4.orig/include/linux/shfs_fs.h	2004-03-20 13:52:37.000000000 +0100
++++ linux-2.6.4/include/linux/shfs_fs.h	2004-03-20 14:12:32.000000000 +0100
+@@ -1,7 +1,7 @@
+ #ifndef _SHFS_FS_H
+ #define _SHFS_FS_H
+ 
+-#include "shfs.h"
++#include <linux/shfs.h>
+ 
+ #define SHFS_IOC_NEWCONN	_IOW('s', 2, int)
+ 

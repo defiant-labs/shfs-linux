@@ -1,0 +1,44 @@
+TODO for shfs:
+
+* rewrite stack allocations -> kmalloc
+* sftp server code support
+* autoconf
+* show_options (cosmetic change)
+* string uid unification (+ /proc interface)
+
+KNOWN BUGS for shfs:
+
+* Date of remote file/dir is (sometimes) not shown correctly (+- 1 day). 
+  This is because of POSIX "show time for files changed in last six 
+  months only" behaviour.
+
+* "stable" option is not working on OSF1. Don't know how to force ls -L to
+  show what GNU ls does.
+
+
+
+DONE:
+- http://lkml.indiana.edu/hypermail/linux/kernel/0601.1/2808.html
+- commented &dcache_lock out (brind it back via mutex or other spin_lock(dentry->...))
+! https://dev.openwrt.org/attachment/ticket/1530/shfs-fixes-gentoo.diff
+- added shfs_mutex
+- https://www.kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.11-rc3/2.6.11-rc3-mm2/broken-out/d_drop-should-use-per-dentry-lock.patch
+- commented dget_locked() out
+- attempted to implement get_lower_inode into dcache.c
+- u.generic_up -> i_private
+- commented out prepare_write and commit_write from file.c
+- get_sb_nodev -> mount_nodev
+- inode.c: .get_sb -> .get_mount
+! https://lkml.org/lkml/2008/3/2/81
+! https://lkml.org/lkml/2008/9/16/63
+
+
+
+BUGS:
+`cat file.txt` ->
+	file_read: permission denied
+`rmdir TEST_FOLDER` ->
+	rmdir: failed to remove `TEST_FOLDER': Device or resource busy
+
+`ls` hangs unless we `ls` from any other directory in the mount
+	point after deleting a file in that dir

@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>shfs: FAQ</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="shfsv4.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+@import url("shfs.css");
+-->
+</style>
+</head>
+<body>
+
+<!-- header -->
+<div id="header">
+<h1>shfs: (Secure) SHell FileSystem Linux kernel module</h1>
+<p><em>&quot;Mount ANY dir from ANY host in a SECURE way&quot;</em></p>
+</div>
+
+<!-- header -->
+<div id="main">
+
+<!-- content -->
+<div id="content">
+
+<!-- sidebar -->
+<div id="sidebar">
+<!-- linkbar -->
+<div id="linkbar">
+<h2>shfs links</h2>
+<p><a href="index.html">About</a></p>
+<p><a href="faq.html">FAQ</a></p>
+<p><a href="http://sourceforge.net/project/showfiles.php?group_id=72997&amp;package_id=93905">Download</a></p>
+<p><a href="install.html">Installation guide</a></p>
+<p><a href="http://sourceforge.net/mail/?group_id=72997">Mailing lists</a></p>
+<p><a href="http://atrey.karlin.mff.cuni.cz/~qiq/src/shfs/">Patches</a></p>
+<p><a href="internals.html">How it works</a></p>
+<p><a href="http://sourceforge.net/projects/shfs/">SourceForge.net</a></p>
+</div>
+</div>
+
+<h1>Frequently asked questions</h1>
+
+<h2>What is the license for this program?</h2>
+
+<p>GNU <a href="../../COPYING">GPL</a>. The module was originally inspired by (and based on) Florin Malita's
+<a href="http://ftpfs.sourceforge.net/">ftpfs</a>. It contains some code from the Linux kernel source tree (smbfs/ncpfs).
+
+<h2>Cannot insert module!</h2>
+<p>Insmod/modprobe complains:</p>
+<p><tt>shfs.o: unresolved symbol ...</tt></p>
+
+<p>The shfs.o module was compiled for incompatible kernel. Recompile the module and try insmod again.</p>
+
+<h2>Symlink target is incorrect!</h2>
+<p>Use <tt>stable</tt> mount option, this causes symlinks to be resolved so you won't see them any more.</p>
+
+<h2>Directory rights are 700 after mount, I cannot access remote share as non-root user!</h2>
+<p>Use <tt>rmode</tt> mount option (e.g. rmode=755).</p>
+
+<h2>Is it possible to use another command instead of ssh?</h2>
+<p>Yes. See --cmd shfsmount option.</p>
+
+<h2>Is it possible to allow ordinary users to mount shfs shares?</h2>
+<p>Yes, though it is not enabled by default. Just set suid (<tt>chmod u+s</tt>) attribute on <tt>/usr/bin/shfsmount</tt> and <tt>/usr/bin/shfsumount</tt>.</p>
+
+<h2>Shfsmount freezes before asking for password/passphrase!</h2>
+<p>Use <tt>shfsmount -v</tt> to get more info about what is to be done. Maybe you just have to confirm the remote host key.</p>
+
+<h2>Kernel Oopses with the very first attempt to access the mounted share!</h2>
+<p>Make sure you have <strong>exactly</strong> the same compiler version as the one used for the kernel (gcc -v; cat /proc/version).</p>
+
+<h2>There is something wrong with the module, it is not working correctly</h2>
+<p>If the bug is reproducible, please either fill in the bugreport on SourceForge.net and/or send me an email. Do not
+forget to specify shfs version, kernel version, exact bug description, way to reproduce it and kernel log file.
+The log could be obtained using <tt>shfsmount -vvv</tt> (the result is to be in /var/log/kern.log or similar). Thanks!</p>
+
+</div>
+</div>
+
+<!-- footer -->
+<div id="footer">
+<p>
+--</p>
+<p><a href="mailto:qiq@ucw.cz">&lt;qiq@ucw.cz&gt;</a></p>
+</div>
+
+</body>
+</html>

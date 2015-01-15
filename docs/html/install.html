@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>shfs: Installation guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="shfsv4.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+@import url("shfs.css");
+-->
+</style>
+</head>
+<body>
+
+<!-- header -->
+<div id="header">
+<h1>shfs: (Secure) SHell FileSystem Linux kernel module</h1>
+<p><em>&quot;Mount ANY dir from ANY host in a SECURE way&quot;</em></p>
+</div>
+
+<!-- header -->
+<div id="main">
+
+<!-- content -->
+<div id="content">
+
+<!-- sidebar -->
+<div id="sidebar">
+<!-- linkbar -->
+<div id="linkbar">
+<h2>shfs links</h2>
+<p><a href="index.html">About</a></p>
+<p><a href="faq.html">FAQ</a></p>
+<p><a href="http://sourceforge.net/project/showfiles.php?group_id=72997&amp;package_id=93905">Download</a></p>
+<p><a href="install.html">Installation guide</a></p>
+<p><a href="http://sourceforge.net/mail/?group_id=72997">Mailing lists</a></p>
+<p><a href="http://atrey.karlin.mff.cuni.cz/~qiq/src/shfs/">Patches</a></p>
+<p><a href="internals.html">How it works</a></p>
+<p><a href="http://sourceforge.net/projects/shfs/">SourceForge.net</a></p>
+</div>
+</div>
+
+<h1>Installation guide</h1>
+
+<p>Shfs stays for SHell File System. It consists of simple Linux kernel module (similar to smbfs, ftpfs
+or ncpfs) and userspace mount utility. The general usage:
+
+<pre>
+$ shfsmount user@host /local/path
+user@host password:
+$ cd /local/path
+</pre>
+
+<h2>Requirements</h2>
+
+<p>Client side:</p>
+<ul>
+<li>Linux 2.4.10+ (2.6) system
+<li>tar, gzip, make
+<li>C compiler (gcc) used while building your kernel (exactly the same version)
+</ul>
+<p>Remote (server) side:</p>
+<ul>
+<li>shell and number of utilities (chmod, chgrp, cut, dd, expr, ln, ls, mkdir, touch, wc, ...)
+<li>or perl version 5+
+</ul>
+
+<h2>Installation</h2>
+
+<p>Installation should be straightforward. First, download sources (shfs-x.xx.tgz).</p>
+<ol>
+<li>unpack the tarball
+<pre>
+# tar -xzvf shfs-x.xx.tgz
+</pre>
+<li>Check the top-level <tt>Makefile</tt> for <tt>KERNEL_SOURCES</tt> variable. It should
+contain path to your kernel directory (where include/linux resides).
+<li><strong>Important</strong> (kernel 2.4): check that your compiler is the same as used for compiling your kernel:
+<pre>
+# gcc --version
+2.96
+# cat /proc/version
+Linux version 2.4.18 (root@host) (gcc version 2.96 20000731
+(Red Hat Linux 7.1 2.96-98))
+</pre>
+If these versions differ, check for your configuration, how to call the kernel compiler
+(e.g. <tt>gcc-3.2</tt>). You will have to pass this to make (<tt>make CC=gcc-3.2</tt>).
+<li>make kernel module and shfsmount
+<pre>
+# make
+</pre>
+or (if you must specify the compiler):
+<pre>
+# make CC=compiler
+</pre>
+<li>insert kernel module
+<pre>
+# insmod shfs/Linux-2.x/shfs.o
+</pre>
+<li>mount remote filesystem, and test it
+<pre>
+# shfsmount/shfsmount user@hostname /mnt
+</pre>
+<li>install shfs
+<pre>
+# make install
+</pre>
+<li>if you don't like it [unlikely ;-)], wipe it out
+<pre>
+# make uninstall
+</pre>
+<li>You can even make (debian/rpm) package and install it.
+<pre>
+# make deb
+# dpkg -i ../shfs*.deb
+</pre>
+or
+<pre>
+# make rpm
+# rpm -ivh ../shfs*.rpm
+</pre>
+<li>There is also possibility to make a patch for kernel:
+<pre>
+# cd shfs/Linux-2.x/
+# make patch
+</pre>
+<p>If the patch is applied, there is no need for kernel module, just shfsmount have to be build and installed.
+</ol>
+
+<h2>Usage</h2>
+
+<p>The shfsmount command has number of options, please refer to the manpage for more
+detailed description.</p>
+
+<p><tt>shfsmount</tt> was designed to have the same interface as the mount command. <tt>make install</tt> should
+have created the symlink <tt>/sbin/mount.shfs -> shfsmount</tt> so you will be able to call</p>
+<pre>
+mount -t shfs user@host /mnt
+</pre>
+<p>exactly as with other filesystems. You can even use automounter to connect to server automatically
+(think about using ssh keys).</p>
+
+<p>If you would like all users to be able to mount (unmount) remote dirs using shfs,
+set <b>suid</b> bit on <tt>/usr/bin/shfsmount</tt> and <tt>shfsumount</tt>. Security checks are similar to <tt>smbmount(8)</tt>.</p>
+
+<h2>Examples</h2>
+
+<p>The simplest version (mount home dir of user at host):</p>
+<pre>
+shfsmount user@host /mnt/shfs
+</pre>
+<p>To specify remote directory:</p>
+<pre>
+shfsmount user@host:/tmp /mnt/shfs
+</pre>
+<p>To specify another port:</p>
+<pre>
+shfsmount -P 2222 user@host /mnt/shfs
+</pre>
+<p>To specify another ssh option:</p>
+<pre>
+shfsmount --cmd="ssh -c blowfish %u@%h /bin/bash" user@host:/tmp /mnt/shfs/
+</pre>
+<p>To make mount survive temporary connection outage (reconnect mode):</p>
+<pre>
+shfsmount --persistent user@host /mnt/shfs
+</pre>
+<p>Longer transfers? Increase cache size (1MB cache per file):</p>
+<pre>
+shfsmount user@host /mnt/shfs -o cachesize=256
+</pre>
+<p>To enable symlink resolution:</p>
+<pre>
+shfsmount -s user@host /mnt/shfs
+</pre>
+<p>To preserve uid (gid) (NFS replace mode :-)):</p>
+<pre>
+shfsmount root@host /mnt/shfs -o preserve,rmode=755
+</pre>
+<p>To see what is wrong (forces kernel debug output too):</p>
+<pre>
+shfsmount -vvv user@host /mnt/shfs
+</pre>
+
+</div>
+</div>
+
+<!-- footer -->
+<div id="footer">
+<p>
+--</p>
+<p><a href="mailto:qiq@ucw.cz">&lt;qiq@ucw.cz&gt;</a></p>
+</div>
+
+</body>
+</html>

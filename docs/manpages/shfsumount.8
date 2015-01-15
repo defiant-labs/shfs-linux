@@ -1,0 +1,41 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.8
+.TH SHFSUMOUNT 8 "2004 Mar 17" "shfsumount" "Shfs Manual"
+.SH NAME
+shfsumount \- umount shfs file system previously mounted by shfsmount.
+.SH SYNOPSIS
+.B shfsumount
+.RB mount_point
+.sp
+.B shfsumount
+.RB [ \-v ]
+.sp
+.SH DESCRIPTION
+The
+.B shfsumount
+detaches previously mounted directory from local filesystem hierarchy.
+If you set suid bit on 
+.B shfsumount
+you enable users to unmount previously mounted remote dirs. 
+.LP
+.SH OPTIONS
+.TP
+.B \-v
+Print version number.
+.SH "CONFORMING TO"
+Nothing.
+.SH BUGS
+.sp 1
+Please report bugs [with diff -u patches, of course ;-)] to 
+.I <qiq@ucw.cz>
+.SH "SEE ALSO"
+.BR shfsmount (8)\
+,
+.BR umount (8)\
+,
+.BR ssh (1)
+.SH "AUTHOR"
+.nf
+Zemljanka core team (Johanka, Dan, Qiq)
+.I Miroslav Spousta <qiq@ucw.cz>
+.fi
